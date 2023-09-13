@@ -7,6 +7,7 @@ import { dataSource } from 'db/datasource';
 import { Order } from './entities/order.entity';
 import { Product } from 'src/product/entities/product.entity';
 import { User } from 'src/user/entities/user.entity';
+import { createQueryBuilder } from 'typeorm';
 
 @Injectable()
 export class OrderService {
@@ -25,15 +26,30 @@ export class OrderService {
   }
 
   async findAll() {
-    return await dataSource.manager.find(Order) 
+    const orders = await dataSource.manager.createQueryBuilder(Order, "order")
+    .leftJoinAndSelect('order.product', 'product')
+    .leftJoinAndSelect('order.user', 'user')
+    .select(['order.id', 'user.name', 'product.name', 'product.price', 'order.status'])
+    .getMany();
+    return orders
   }
 
   async findOne(id: number) {
     const order = await dataSource.manager.findOneBy(Order, { id: id })
     if (order) {
-      const product = await dataSource.manager.findOneBy(Product, { id: order.productId })
-      const user = await dataSource.manager.findOneBy(User, { id: order.userId })
-      return { "orderID": order.id, "user": user.name, "product": product.name, "price": product.price, "status": order.status}
+      const orders = dataSource.manager.createQueryBuilder(Order, "order")
+        .leftJoinAndSelect('order.product', 'product')
+        .leftJoinAndSelect('order.user', 'user')
+        .select(['order.id', 'user.name', 'product.name', 'product.price', 'order.status'])
+        .where("order.id = :id", { id: id })
+        .getOne();
+      if(order.user.name == null || order.product.name == null){
+        return { "message": "Order not found" }
+      }
+      else
+      {
+        return orders
+      }
     }
     else{
       return { "message": "Order not found" }
@@ -41,6 +57,7 @@ export class OrderService {
   }
 
   async update(id: number, updateOrderDto: UpdateOrderDto) {
+    console.log(updateOrderDto)
     try{
       const orderToUpdate = await dataSource.manager.findOneBy(Order, { id: id })
       if (orderToUpdate) {

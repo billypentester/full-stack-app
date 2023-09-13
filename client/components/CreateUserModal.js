@@ -21,6 +21,12 @@ const CreateUserModal = ({ onCreate }) => {
         }
     }
 
+    const dismissModal = (e) => {
+        e.preventDefault()
+        document.getElementById('create').close()
+        setCustomer({ name: '', email: '', age: '' })
+    }
+
     return (
         <dialog id="create" className="modal">
             <div className="modal-box">
@@ -46,9 +52,7 @@ const CreateUserModal = ({ onCreate }) => {
                     </div>
                     <div className="modal-action">
                         <button className="btn btn-success" onClick={createCustomer}>Create</button>
-                        <form method="dialog">
-                            <button className="btn">Cancel</button>
-                        </form>
+                        <button className="btn" onClick={dismissModal}>Cancel</button>
                     </div>
                 </form>
             </div>
