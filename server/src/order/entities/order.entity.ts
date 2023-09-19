@@ -24,5 +24,5 @@ export class Order {
 
     @Column()
     productId: number;
-    
+
 }

@@ -22,6 +22,11 @@ const EditModal = ({ customer, onEdit }) => {
         }
     }
 
+    const editCustomer = (e) => {
+        e.preventDefault()
+        document.getElementById('edit').close()
+    }
+
     useEffect(() => {
         setUpdateCustomer(customer)
     }, [customer])
@@ -57,9 +62,7 @@ const EditModal = ({ customer, onEdit }) => {
                     </div>
                     <div className="modal-action">
                         <button className="btn btn-warning" onClick={updateCustomer}>Update</button>
-                        <form method="dialog">
-                            <button className="btn">Cancel</button>
-                        </form>
+                        <button className="btn" onClick={editCustomer}>Cancel</button>
                     </div>
                 </form>
             </div>

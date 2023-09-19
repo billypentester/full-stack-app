@@ -1,71 +1,98 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 import { User } from './entities/user.entity';
-import { dataSource } from './../../db/datasource';
-
-dataSource.initialize()
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
 
-  async create(createUserDto: CreateUserDto) {
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
+
+  // get all users
+
+  async findAll(res: any) {
+    try{
+       const users = await this.userRepository.find()
+       res.status(HttpStatus.OK).json(users)
+    }
+     catch(error){
+       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({message: "Internal server error"})
+     }
+  }
+ 
+  // get user by id
+
+  async findOne(id: number, res: any) {
+    try{
+      const user = await this.userRepository.findOneBy({ id: id })
+      if (user) {
+        res.status(HttpStatus.OK).json(user)
+      }
+      else{
+        res.status(HttpStatus.NOT_FOUND).json({message: "User not found"})
+      }
+    }
+    catch(error){
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({message: "Internal server error"})
+    }
+  }
+
+  // create a new user
+
+  async create(createUserDto: CreateUserDto, res: any) {
     try{
       const user = new User()
       user.name = createUserDto.name
       user.email = createUserDto.email
       user.age = createUserDto.age
-      return await dataSource.manager.save(user)
+      const savedUser = await this.userRepository.save(user)
+      res.status(HttpStatus.CREATED).json(savedUser)
     }
     catch(error){
-      return {  "message": "Error creating user"}
+      res.status(HttpStatus.BAD_REQUEST).json({message: "Bad Request"})
     }
   }
 
-  async findAll() {
-    return await dataSource.manager.find(User)
-  }
+  // update user by id
 
-  async findOne(id: number) {
-    const user = await dataSource.manager.findOneBy(User, { id: id })
-    if (user) {
-      return user
-    }
-    else{
-      return { "message": "User not found" }
-    }
-  }
-
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto, res: any) {
     try{
-      const userToUpdate = await dataSource.manager.findOneBy(User, { id: id })
+      const userToUpdate = await this.userRepository.findOneBy({ id: id })
       if (userToUpdate) {
-        await dataSource.manager.update(User, id, updateUserDto)
-        return { "message": "User Successfully updated" }
+        const updatedUser = await this.userRepository.update(id, updateUserDto)
+        res.status(HttpStatus.OK).json(updatedUser)
       }
       else{
-        return { "message": "User not found" }
+        res.status(HttpStatus.NOT_FOUND).json({message: "User not found"})
       }
     }
     catch(error){
-      return {  "message": "Error updating user"}
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({message: "Internal server error"})
     }
   }
 
-  async remove(id: number) {
+  // delete user by id
+
+  async remove(id: number, res: any) {
     try{
-      const userToRemove = await dataSource.manager.findOneBy(User, { id: id })
-      if (userToRemove) {
-        await dataSource.manager.remove(userToRemove)
-        return { "message": "User Successfully deleted" }
+      const userToDelete = await this.userRepository.findOneBy({ id: id })
+      console.log(userToDelete)
+      if (userToDelete) {
+        await this.userRepository.delete(id)
+        res.status(HttpStatus.NO_CONTENT).json({message: "User deleted"})
       }
       else{
-        return { "message": "User not found" }
+        res.status(HttpStatus.NOT_FOUND).json({message: "User not found"})
       }
     }
     catch(error){
-      return {  "message": "Error deleting user"}
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({message: "Internal server error"})
     }
   }
 

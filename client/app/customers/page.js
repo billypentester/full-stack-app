@@ -13,6 +13,7 @@ export default function Customers() {
   const [editCustomer, setEditCustomer] = useState('');
   const [search, setSearch] = useState('');
 
+
   const getAllCustomers = async () => {
     const response = await fetch('http://localhost:5000/user/');
     const data = await response.json();
@@ -25,10 +26,9 @@ export default function Customers() {
   }
 
   const EditAction = async (customer) => {
-    document.getElementById('edit-user').showModal();
+    document.getElementById('edit').showModal();
     setEditCustomer(customer);
   }
-
 
   useEffect(() => {
     getAllCustomers();
@@ -41,11 +41,13 @@ export default function Customers() {
         <p className="text-sm text-gray-500">Total Customers: {customers.length}</p>
       </div>
       <div className="flex flex-1 justify-between">
-        <input type="text" placeholder="Search for customer..." className="input input-bordered input-success w-full max-w-xs" onChange={(e)=>{setSearch(e.target.value)}}/>
+        {/* <input type="text" placeholder="Search for customer..." className="input input-bordered input-success w-full max-w-xs" onChange={(e)=>{setSearch(e.target.value)}}/> */}
         <button className="btn btn-success" onClick={()=>document.getElementById('create').showModal()}>Add New Customer</button>
       </div>
       <div className="divider my-5"></div>
-      <div className="overflow-x-auto my-5">
+      {
+        customers.length > 0 ?
+        <div className="overflow-x-auto my-5">
         <table className="table">
           <thead>
             <tr>
@@ -73,7 +75,13 @@ export default function Customers() {
             }
           </tbody>
         </table>
-      </div>
+        </div>
+        :
+        <div className="flex flex-col justify-center items-center my-10">
+          <h1 className="text-3xl font-bold">No Customers Found</h1>
+          <p className="text-sm text-gray-500">Try adding a new customer</p>
+        </div>
+      }
 
       <CreateModal onCreate={getAllCustomers} />
       <EditModal customer={editCustomer} onEdit={getAllCustomers} />

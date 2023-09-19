@@ -40,9 +40,7 @@ const CreateProductModal = ({ onCreate }) => {
                     </div>
                     <div className="modal-action">
                         <button className="btn btn-success" onClick={createProduct}>Create</button>
-                        <form method="dialog">
-                            <button className="btn">Cancel</button>
-                        </form>
+                        <button className="btn" onClick={(e)=>{e.preventDefault();document.getElementById('create').close()}}>Cancel</button>
                     </div>
                 </form>
             </div>

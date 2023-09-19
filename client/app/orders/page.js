@@ -40,11 +40,13 @@ export default function Orders() {
         <p className="text-sm text-gray-500">Total Orders: {orders.length}</p>
       </div>
       <div className="flex flex-1 justify-between">
-        <input type="text" placeholder="Search for order..." className="input input-bordered input-success w-full max-w-xs" onChange={(e)=>{setSearch(e.target.value)}}/>
+        {/* <input type="text" placeholder="Search for order..." className="input input-bordered input-success w-full max-w-xs" onChange={(e)=>{setSearch(e.target.value)}}/> */}
         <button className="btn btn-success" onClick={()=>document.getElementById('create').showModal()}>Create New Order</button>
       </div>
       <div className="divider my-5"></div>
-      <div className="overflow-x-auto my-5">
+      {
+        orders.length > 0 ?
+        <div className="overflow-x-auto my-5">
         <table className="table">
           <thead>
             <tr>
@@ -74,7 +76,13 @@ export default function Orders() {
             }
           </tbody>
         </table>
-      </div>
+        </div>
+        :
+        <div className="flex flex-col justify-center items-center my-10">
+          <h1 className="text-3xl font-bold">No Order</h1>
+          <p className="text-sm text-gray-500">Create a new order to get started</p>
+        </div>
+      }
 
       <CreateModal onCreate={getAllOrders} /> 
       <EditModal order={editOrder} onEdit={getAllOrders} /> 

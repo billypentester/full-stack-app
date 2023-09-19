@@ -6,6 +6,8 @@ import DeleteModal from "@/components/DeleteModal";
 import CreateModal from "@/components/CreateProductModal";
 import EditModal from "@/components/EditProductModal";
 
+import Loader from "@/components/Loader";
+
 export default function Products() {
 
   const [products, setProducts] = useState([]);
@@ -14,9 +16,14 @@ export default function Products() {
   const [search, setSearch] = useState('');
 
   const getAllProducts = async () => {
-    const response = await fetch('http://localhost:5000/product/');
-    const data = await response.json();
-    setProducts(data);
+    try{
+      const response = await fetch('http://localhost:5000/product/');
+      const data = await response.json();
+      setProducts(data);
+    }
+    catch(err){
+      setProduct([])
+    }
   }
 
   const deleteAction = async (id) => {
@@ -29,26 +36,24 @@ export default function Products() {
     setEditProduct(customer);
   }
 
-  const onDelete = (id) => {
-    setProducts(products.filter(product => product.id !== id));
-  }
-
-
   useEffect(() => {
     getAllProducts();
   }, []);
 
   return (
     <section className="px-16">
-      <div className="flex flex-col justify-between items-center my-10">
-        <h1 className="text-3xl font-bold">Products</h1>
-        <p className="text-sm text-gray-500">Total Products: {products.length}</p>
-      </div>
-      <div className="flex flex-1 justify-between">
-        <input type="text" placeholder="Search for product..." className="input input-bordered input-success w-full max-w-xs" onChange={(e)=>{setSearch(e.target.value)}}/>
-        <button className="btn btn-success" onClick={()=>document.getElementById('create').showModal()}>Add New Product</button>
-      </div>
-      <div className="divider my-5"></div>
+    <div className="flex flex-col justify-between items-center my-10">
+      <h1 className="text-3xl font-bold">Products</h1>
+      <p className="text-sm text-gray-500">Total Products: {products.length}</p>
+    </div>
+    <div className="flex flex-1 justify-between">
+      {/* <input type="text" placeholder="Search for product..." className="input input-bordered input-success w-full max-w-xs" onChange={(e)=>{setSearch(e.target.value)}}/> */}
+      <button className="btn btn-success" onClick={()=>document.getElementById('create').showModal()}>Add New Product</button>
+    </div>
+    <div className="divider my-5"></div>
+    
+    {
+      products.length > 0 ? 
       <div className="overflow-x-auto my-5">
         <table className="table">
           <thead>
@@ -76,10 +81,17 @@ export default function Products() {
           </tbody>
         </table>
       </div>
+      :
+      <div className="flex flex-col justify-center items-center my-10">
+        <h1 className="text-3xl font-bold">No Product</h1>
+        <p className="text-sm text-gray-500">Create a new product to get started</p>
+      </div>
+    }
 
-      <CreateModal onCreate={getAllProducts} /> 
-      <EditModal product={editProduct} onEdit={getAllProducts} />
-      <DeleteModal item={product} onDelete={getAllProducts} initial='product' />
+    <CreateModal onCreate={getAllProducts} /> 
+    <EditModal product={editProduct} onEdit={getAllProducts} />
+    <DeleteModal item={product} onDelete={getAllProducts} initial='product' />
+
     </section>
   )
 }

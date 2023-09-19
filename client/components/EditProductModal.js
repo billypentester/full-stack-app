@@ -50,9 +50,7 @@ const EditProductModal = ({ product, onEdit }) => {
                     </div>
                     <div className="modal-action">
                         <button className="btn btn-warning" onClick={updateProduct}>Update</button>
-                        <form method="dialog">
-                            <button className="btn">Cancel</button>
-                        </form>
+                        <button className="btn" onClick={(e)=>{e.preventDefault();document.getElementById('edit').close()}}>Cancel</button>
                     </div>
                 </form>
             </div>

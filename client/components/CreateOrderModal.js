@@ -25,6 +25,11 @@ const CreateOrderModal = ({ onCreate }) => {
         }
     }
 
+    const cancelOrder = (e) => {
+        e.preventDefault()
+        document.getElementById('create').close()
+    }
+
     const getAllProducts = async() => {
         const response = await fetch('http://localhost:5000/product/')
         const data = await response.json()
@@ -99,9 +104,7 @@ const CreateOrderModal = ({ onCreate }) => {
                     </div>
                     <div className="modal-action">
                         <button className="btn btn-success" onClick={createOrder}>Create</button>
-                        <form method="dialog">
-                            <button className="btn">Cancel</button>
-                        </form>
+                        <button className="btn btn-error" onClick={cancelOrder}>Cancel</button>
                     </div>
                 </form>
             </div>
